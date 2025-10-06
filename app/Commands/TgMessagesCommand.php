@@ -4,6 +4,8 @@ namespace App\Commands;
 
 use App\Application;
 use App\Telegram\TelegramApi;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 // im not doing this. okay bye
 class TgMessagesCommand extends Command
