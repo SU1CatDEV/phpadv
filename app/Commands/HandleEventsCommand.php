@@ -8,6 +8,8 @@ use App\Database\SQLite;
 
 use App\EventSender\EventSender;
 
+use App\Telegram\TelegramApi;
+
 use App\Models\Event;
 
 //use App\Models\EventDto;
@@ -34,9 +36,11 @@ class HandleEventsCommand extends Command
 
         $events = $event->select();
 
-        $eventSender = new EventSender();
+        var_dump($events);
+        
+        $eventSender = new EventSender(new TelegramApi($this->app->env('TELEGRAM_TOKEN')));
         foreach ($events as $event) {
-	    echo $this->shouldEventBeRan($event);
+            // var_dump($event);
             if ($this->shouldEventBeRan($event)) {
                 $eventSender->sendMessage($event["receiver_id"], $event["text"]);
             }
@@ -46,21 +50,21 @@ class HandleEventsCommand extends Command
     }
 
     private function shouldEventBeRan($event): bool
-{
-    $currentMinute = date("i");
-    $currentHour = date("H");
-    $currentDay = date("d");
-    $currentMonth = date("m");
-    $currentWeekday = date("w");
+    {
+        $currentMinute = date("i");
+        $currentHour = date("H");
+        $currentDay = date("d");
+        $currentMonth = date("m");
+        $currentWeekday = date("w");
 
-    return (
-        ($event['minute'] === null || $event['minute'] == $currentMinute) &&
-        ($event['hour'] === null || $event['hour'] == $currentHour) &&
-        ($event['day'] === null || $event['day'] == $currentDay) &&
-        ($event['month'] === null || $event['month'] == $currentMonth) &&
-        ($event['day_of_week'] === null || $event['day_of_week'] == $currentWeekday)
-    );
-}
+        return (
+            ($event['minute'] === null || $event['minute'] == $currentMinute) &&
+            ($event['hour'] === null || $event['hour'] == $currentHour) &&
+            ($event['day'] === null || $event['day'] == $currentDay) &&
+            ($event['month'] === null || $event['month'] == $currentMonth) &&
+            ($event['day_of_week'] === null || $event['day_of_week'] == $currentWeekday)
+        );
+    }
 
 
 }

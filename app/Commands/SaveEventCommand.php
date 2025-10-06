@@ -6,8 +6,9 @@ use App\Application;
 use App\Database\SQLite;
 use App\Models\Event;
 
-//php runner -c save_event --name 'Имя события' --receiver ‘Айди получателя, пока
-//любой’ --text 'Текст напоминания' --cron '* * * * *'
+// TODO test this actually works maybe.
+
+//php runner -c save_event --name 'Имя события' --receiver 'Айди получателя, пока любой' --text 'Текст напоминания' --cron '* * * * *'
 class SaveEventCommand extends Command
 {
 
@@ -97,7 +98,7 @@ class SaveEventCommand extends Command
     private function isNeedHelp(array $options): bool
 
     {
-
+        var_dump($options);
         return !isset($options['name']) ||
 
             !isset($options['text']) ||
@@ -153,6 +154,8 @@ class SaveEventCommand extends Command
     private function saveEvent(array $params): void
 
     {
+        
+        var_dump($params);
 
         $event = new Event(new SQLite($this->app));
 

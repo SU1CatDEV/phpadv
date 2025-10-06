@@ -13,6 +13,8 @@ class SQLite extends Db
     {
         $this->app = $app;
 
+        var_dump($this->app->env('SQLITE_DATABASE'));
+
         parent::__construct(
             'sqlite:' . $this->app->env('SQLITE_DATABASE'),
             null,
