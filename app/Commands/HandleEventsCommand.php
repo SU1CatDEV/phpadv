@@ -35,8 +35,6 @@ class HandleEventsCommand extends Command
         $event = new Event(new SQLite($this->app));
 
         $events = $event->select();
-
-        var_dump($events);
         
         $eventSender = new EventSender(new TelegramApi($this->app->env('TELEGRAM_TOKEN')));
         foreach ($events as $event) {

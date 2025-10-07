@@ -6,6 +6,10 @@ use App\Application;
 use App\Database\SQLite;
 use App\Models\Event;
 
+use App\Helpers\Cron;
+use App\Exceptions\MalformedCronException;
+use App\Actions\EventSaver;
+
 //php runner -c save_event --name 'Имя события' --receiver 'Айди получателя, пока любой' --text 'Текст напоминания' --cron '* * * * *'
 class SaveEventCommand extends Command
 {
@@ -33,14 +37,14 @@ class SaveEventCommand extends Command
 
         }
 
-        $cronValues = $this->getCronValues($options['cron']);
+        $cron = new Cron();
 
-        if (count($cronValues) != 5) {
-
+        try {
+            $cronValues = $cron->getCronValues($options['cron']);
+        } catch (MalformedCronException $e) {
             $this->showHelp();
-
+            // var_dump(99);
             return;
-
         }
 
         $params = [
@@ -63,8 +67,10 @@ class SaveEventCommand extends Command
 
         ];
 
-        $this->saveEvent($params);
+        $eventModel = new Event(new SQLite($this->app));
 
+        $eventSaver = new EventSaver($eventModel);
+        $eventSaver->handle($params);
     }
 
     private function getGetoptOptionValues(): array
@@ -96,6 +102,7 @@ class SaveEventCommand extends Command
     public function isNeedHelp(array $options): bool
 
     {
+        // var_dump($options);
         return !isset($options['name']) ||
 
             !isset($options['text']) ||
@@ -132,38 +139,10 @@ class SaveEventCommand extends Command
 
     }
 
-    private function getCronValues(string $cronString): array
-
-    {
-
-        $cronValues = explode(" ", $cronString);
-
-        $cronValues = array_map(function ($item) {
-
-            return $item === "*" ? null : $item;
-
-        }, $cronValues);
-
-        return $cronValues;
-
-    }
-
     private function saveEvent(array $params): void
 
     {
         
-        var_dump($params);
-
-        $event = new Event(new SQLite($this->app));
-
-        $event->insert(
-
-            implode(', ', array_keys($params)),
-
-            array_values($params)
-
-        );
-
     }
 
 }
