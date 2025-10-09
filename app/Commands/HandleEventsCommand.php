@@ -12,6 +12,8 @@ use App\Telegram\TelegramApi;
 
 use App\Models\Event;
 
+use App\Queue\RabbitMQ;
+
 //use App\Models\EventDto;
 
 class HandleEventsCommand extends Command
@@ -36,7 +38,8 @@ class HandleEventsCommand extends Command
 
         $events = $event->select();
         
-        $eventSender = new EventSender(new TelegramApi($this->app->env('TELEGRAM_TOKEN')));
+        $queue = new RabbitMQ('eventSender');
+        $eventSender = new EventSender(new TelegramApi($this->app->env('TELEGRAM_TOKEN')), $queue);
         foreach ($events as $event) {
             // var_dump($event);
             if ($this->shouldEventBeRan($event)) {
